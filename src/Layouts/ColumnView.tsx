@@ -3,7 +3,8 @@ import { View } from "../Views/View";
 
 export interface ColumnProps {
 	Width?: UDim;
-	Alignment?: Roact.InferEnumNames<Enum.HorizontalAlignment> | Enum.HorizontalAlignment;
+	VerticalAlignment?: Roact.InferEnumNames<Enum.VerticalAlignment> | Enum.VerticalAlignment;
+	HorizontalAlignment?: Roact.InferEnumNames<Enum.HorizontalAlignment> | Enum.HorizontalAlignment;
 }
 /**
  * Represents a Column in a `<ColumnView/>` ({@link ColumnView})
@@ -53,8 +54,6 @@ export class ColumnView extends Roact.Component<ColumnViewProps> {
 				}
 			}
 
-			print(autoSizeCount, widthOffset, scaleOffset, "offsets", scaleOffset + autoSizeCount);
-
 			let idx = 0;
 			const count = children.size();
 			for (const [key, child] of children) {
@@ -71,8 +70,10 @@ export class ColumnView extends Roact.Component<ColumnViewProps> {
 							AutomaticSize="Y"
 						>
 							<uilistlayout
+								VerticalAlignment={props.VerticalAlignment}
 								HorizontalAlignment={
-									props.Alignment ?? (idx === 0 ? "Left" : idx === count - 1 ? "Right" : "Center")
+									props.HorizontalAlignment ??
+									(idx === 0 ? "Left" : idx === count - 1 ? "Right" : "Center")
 								}
 							/>
 							{child}
