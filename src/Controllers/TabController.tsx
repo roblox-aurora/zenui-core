@@ -4,9 +4,15 @@ import { View } from "../Views/View";
 export type InferTabProps<T> = T extends (props: infer A) => Roact.Element ? A : never;
 
 export interface TabControllerRenderRequest<P> {
-	TabItem: P;
-	IsActive: boolean;
-	TabClickDelegate: () => void;
+	readonly TabItem: P;
+	readonly IsActive: boolean;
+	readonly TabClickDelegate: () => void;
+}
+
+export interface TabControllerRenderContainerRequests<TTabViewComponent extends ComponentLike> {
+	readonly Tabs: Roact.Children;
+	readonly Other: Roact.Children;
+	readonly Props: TabControllerProps<TTabViewComponent>;
 }
 
 type ComponentLike = Roact.FunctionComponent<any> | Roact.Component<any, any>;
@@ -31,7 +37,12 @@ export interface TabControllerProps<TTabViewComponent extends ComponentLike>
 	/**
 	 * Handle the tab being clicked - This is invoked by the `TabClickedDelegate` in {@link TabControllerRenderRequest} that's passed to `RenderTabItem`
 	 */
-	OnTabClicked: (index: number) => void;
+	OnTabClicked: (clickedTabIndex: number, clickedTabProps: InferTabProps<TTabViewComponent>) => void;
+
+	/**
+	 * Custom renderer for the tab container - will give all elements provided + the props provided to the renderer
+	 */
+	RenderTabContainer?: (req: TabControllerRenderContainerRequests<TTabViewComponent>) => Roact.Element;
 }
 
 /**
@@ -59,19 +70,30 @@ export class TabController<TTabViewComponent extends ComponentLike> extends Roac
 					key,
 					this.props.RenderTabItem({
 						TabItem: child.props as InferTabProps<TTabViewComponent>,
-						TabClickDelegate: () => this.props.OnTabClicked(currTabIndex),
+						TabClickDelegate: () =>
+							this.props.OnTabClicked(currTabIndex, child.props as InferTabProps<TTabViewComponent>),
 						IsActive: this.props.SelectedTabIndex === tabIndex,
 					}),
 				);
+				children.delete(key);
 				tabIndex++;
 			}
 		}
 
-		return (
-			<View Size={this.props.Size} Position={this.props.Position}>
-				<uilistlayout Padding={this.props.TabPadding} FillDirection={this.props.TabDirection} />
-				{elements}
-			</View>
-		);
+		if (this.props.RenderTabContainer) {
+			return this.props.RenderTabContainer({
+				Other: children,
+				Tabs: elements,
+				Props: this.props,
+			});
+		} else {
+			return (
+				<View Size={this.props.Size} Position={this.props.Position}>
+					<uilistlayout Padding={this.props.TabPadding} FillDirection={this.props.TabDirection} />
+					{children}
+					{elements}
+				</View>
+			);
+		}
 	}
 }
