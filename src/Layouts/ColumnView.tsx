@@ -1,4 +1,5 @@
 import Roact from "@rbxts/roact";
+import Padding, { PaddingDim } from "../Utility/Padding";
 import { View } from "../Views/View";
 
 export interface ColumnProps {
@@ -14,7 +15,15 @@ export function Column(props: Roact.PropsWithChildren<ColumnProps>) {
 }
 
 export interface ColumnViewProps {
-	Size?: UDim2;
+	readonly Size?: UDim2;
+	/**
+	 * The amount of spacing between each column. If you want outer padding on the column view, use `Padding`.
+	 */
+	readonly ColumnSpacing?: UDim;
+	/**
+	 * The amount of padding around the column view
+	 */
+	readonly Padding?: Padding | PaddingDim;
 }
 /**
  * ### ZenUI::ColumnView
@@ -36,6 +45,9 @@ export class ColumnView extends Roact.Component<ColumnViewProps> {
 		const children = this.props[Roact.Children];
 		const containerMap = new Map<string | number, Roact.Element>();
 
+		const colPadding = this.props.ColumnSpacing ?? new UDim();
+		const padding = this.props.Padding;
+
 		if (children) {
 			let widthOffset = 0;
 			let scaleOffset = 0;
@@ -53,6 +65,9 @@ export class ColumnView extends Roact.Component<ColumnViewProps> {
 					}
 				}
 			}
+
+			widthOffset -= colPadding.Offset * children.size();
+			scaleOffset -= colPadding.Scale * children.size();
 
 			let idx = 0;
 			const count = children.size();
@@ -87,7 +102,8 @@ export class ColumnView extends Roact.Component<ColumnViewProps> {
 
 		return (
 			<View Size={this.props.Size ?? new UDim2(1, 0, 0, 0)} AutomaticSize="Y">
-				<uilistlayout FillDirection="Horizontal" />
+				<uilistlayout FillDirection="Horizontal" Padding={colPadding} />
+				{padding && <Padding Padding={padding} />}
 				{containerMap}
 			</View>
 		);
