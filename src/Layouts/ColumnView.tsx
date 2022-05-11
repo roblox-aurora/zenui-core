@@ -66,8 +66,10 @@ export class ColumnView extends Roact.Component<ColumnViewProps> {
 				}
 			}
 
-			widthOffset -= colPadding.Offset * children.size();
-			scaleOffset -= colPadding.Scale * children.size();
+			const seperatorCount = math.max(0, children.size() - 1);
+
+			widthOffset -= colPadding.Offset * seperatorCount;
+			scaleOffset -= colPadding.Scale * seperatorCount;
 
 			let idx = 0;
 			const count = children.size();
