@@ -65,7 +65,7 @@ export class ColumnView extends Roact.Component<ColumnViewProps> {
 							Size={
 								props.Width
 									? new UDim2(props.Width.Scale, props.Width.Offset, 1, 0)
-									: new UDim2((1 + scaleOffset) * (1 / autoSizeCount), -widthOffset, 0, 0)
+									: new UDim2((1 + scaleOffset) * (1 / autoSizeCount), widthOffset, 0, 0)
 							}
 							AutomaticSize="Y"
 						>
