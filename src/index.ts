@@ -5,6 +5,7 @@
 export * from "./Controllers/PageController";
 export * from "./Controllers/TabController";
 export * from "./Layouts/ColumnView";
+export * from "./Layouts/RowView";
 export * from "./Utility/Padding";
 export * from "./Views/ListView";
 export * from "./Views/View";

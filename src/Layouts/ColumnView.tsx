@@ -9,6 +9,7 @@ export interface ColumnProps {
 }
 /**
  * Represents a Column in a `<ColumnView/>` ({@link ColumnView})
+ * @hidden
  */
 export function Column(props: Roact.PropsWithChildren<ColumnProps>) {
 	return <>{props[Roact.Children]}</>;
@@ -32,6 +33,7 @@ export interface ColumnViewProps {
 }
 /**
  * ### ZenUI::ColumnView
+ * **Note**: Do not mix with `RowView`
  *
  * A view that scales columns relative to how many `<Columns/>` there are, or to how they're sized. If you want static or certain sized columns, use the `Width` property on {@link Column}.
  *
@@ -46,6 +48,11 @@ export interface ColumnViewProps {
  * etc.
  */
 export class ColumnView extends Roact.Component<ColumnViewProps> {
+	/**
+	 * Represents a Column in a `<ColumnView/>` ({@link ColumnView})
+	 */
+	public static Column = Column;
+
 	public render(): Roact.Element | undefined {
 		const children = this.props[Roact.Children];
 		const containerMap = new Map<string | number, Roact.Element>();
@@ -71,10 +78,10 @@ export class ColumnView extends Roact.Component<ColumnViewProps> {
 				}
 			}
 
-			const seperatorCount = math.max(0, children.size() - 1);
+			const seperatorCount = math.max(0, children.size());
 
-			widthOffset -= colPadding.Offset * seperatorCount;
-			scaleOffset -= colPadding.Scale * seperatorCount;
+			widthOffset -= colPadding.Offset * (seperatorCount / children.size());
+			scaleOffset -= colPadding.Scale * (seperatorCount / children.size());
 
 			let idx = 0;
 			const count = children.size();
@@ -86,8 +93,13 @@ export class ColumnView extends Roact.Component<ColumnViewProps> {
 						<View
 							Size={
 								props.Width
-									? new UDim2(props.Width.Scale, props.Width.Offset, 1, 0)
-									: new UDim2((1 + scaleOffset) * (1 / autoSizeCount), widthOffset, 0, 0)
+									? new UDim2(props.Width.Scale, props.Width.Offset, 0, 0)
+									: new UDim2(
+											(1 + scaleOffset) * (1 / autoSizeCount),
+											widthOffset / autoSizeCount,
+											0,
+											0,
+									  )
 							}
 							AutomaticSize="Y"
 						>
@@ -112,7 +124,7 @@ export class ColumnView extends Roact.Component<ColumnViewProps> {
 				<uilistlayout
 					FillDirection="Horizontal"
 					Padding={colPadding}
-					HorizontalAlignment={this.props.HorizontalAlignment}
+					HorizontalAlignment={this.props.HorizontalAlignment ?? "Center"}
 				/>
 				{padding && <Padding Padding={padding} />}
 				{containerMap}
