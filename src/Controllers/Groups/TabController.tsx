@@ -1,5 +1,5 @@
 import Roact from "@rbxts/roact";
-import { View } from "../Views/View";
+import { View } from "../../Views/View";
 
 export type InferTabProps<T> = T extends (props: infer A) => Roact.Element ? A : never;
 
