@@ -1,10 +1,11 @@
+import Roact from "@rbxts/roact";
+
 type PaddingResult = Pick<UIPadding, "PaddingTop" | "PaddingBottom" | "PaddingLeft" | "PaddingRight">;
 type PaddingOffset = {
 	[P in keyof PaddingResult]: number;
 };
 
 type PaddingAxisOffset = { PaddingHorizontal?: number; PaddingVertical?: number };
-
 export type WidgetPadding = (Partial<PaddingOffset> & PaddingAxisOffset) | number;
 export type WidgetAxisPadding = PaddingAxisOffset | number;
 
@@ -57,35 +58,19 @@ export function CalculatePadding(padding: WidgetPadding): Partial<PaddingResult>
 	}
 }
 
-import Roact from "@rbxts/roact";
-import variantModule, { isOfVariant, VariantOf } from "@rbxts/variant";
+/**
+ * Padding dimensions
+ */
+export class UPaddingDim {
+	public constructor(
+		public readonly Left: UDim,
+		public readonly Top: UDim,
+		public readonly Right: UDim,
+		public readonly Bottom: UDim,
+	) {}
 
-export const PaddingDim = variantModule({
-	fromScale: (padding: Padding) => {
-		const { Left = 0, Right = 0, Top = 0, Bottom = 0, Vertical = 0, Horizontal = 0 } = padding;
-
-		return {
-			Value: identity<Partial<UIPadding>>({
-				PaddingLeft: new UDim(Left + Horizontal, 0),
-				PaddingRight: new UDim(Right + Horizontal, 0),
-				PaddingTop: new UDim(Top + Vertical, 0),
-				PaddingBottom: new UDim(Bottom + Vertical, 0),
-			}),
-		};
-	},
-	fromOffset: (padding: Padding) => {
-		const { Left = 0, Right = 0, Top = 0, Bottom = 0, Vertical = 0, Horizontal = 0 } = padding;
-
-		return {
-			Value: identity<Partial<UIPadding>>({
-				PaddingLeft: new UDim(0, Left + Horizontal),
-				PaddingRight: new UDim(0, Right + Horizontal),
-				PaddingTop: new UDim(0, Top + Vertical),
-				PaddingBottom: new UDim(0, Bottom + Vertical),
-			}),
-		};
-	},
-	from: (scale: Padding, offset: Padding) => {
+	/** @deprecated */
+	public static from(this: void, scale: Padding, offset: Padding) {
 		const { Left = 0, Right = 0, Top = 0, Bottom = 0, Vertical = 0, Horizontal = 0 } = scale;
 		const {
 			Left: leftOffset = 0,
@@ -96,17 +81,91 @@ export const PaddingDim = variantModule({
 			Horizontal: horizontalOffset = 0,
 		} = offset;
 
-		return {
-			Value: identity<Partial<UIPadding>>({
-				PaddingLeft: new UDim(Left + Horizontal, leftOffset + horizontalOffset),
-				PaddingRight: new UDim(Right + Horizontal, rightOffset + horizontalOffset),
-				PaddingTop: new UDim(Top + Vertical, topOffset + verticalOffset),
-				PaddingBottom: new UDim(Bottom + Vertical, bottomOffset + verticalOffset),
-			}),
-		};
-	},
-});
-export type PaddingDim = VariantOf<typeof PaddingDim>;
+		const padding = new UPaddingDim(
+			new UDim(Left + Horizontal, leftOffset + horizontalOffset),
+			new UDim(Top + Vertical, topOffset + verticalOffset),
+			new UDim(Right + Horizontal, rightOffset + horizontalOffset),
+			new UDim(Bottom + Vertical, bottomOffset + verticalOffset),
+		);
+		return padding;
+	}
+
+	/** @deprecated */
+	public static fromOffset(this: void, offset: Padding) {
+		const { Left = 0, Right = 0, Top = 0, Bottom = 0, Vertical = 0, Horizontal = 0 } = offset;
+
+		return new UPaddingDim(
+			new UDim(0, Left + Horizontal),
+			new UDim(0, Top + Vertical),
+			new UDim(0, Right + Horizontal),
+			new UDim(0, Bottom + Vertical),
+		);
+	}
+
+	public static left(this: void, scale: number, offset: number) {
+		return new UPaddingDim(new UDim(scale, offset), new UDim(), new UDim(), new UDim());
+	}
+
+	public static right(this: void, scale: number, offset: number) {
+		return new UPaddingDim(new UDim(), new UDim(), new UDim(scale, offset), new UDim());
+	}
+
+	public static top(this: void, scale: number, offset: number) {
+		return new UPaddingDim(new UDim(), new UDim(scale, offset), new UDim(), new UDim());
+	}
+
+	public static bottom(this: void, scale: number, offset: number) {
+		return new UPaddingDim(new UDim(), new UDim(), new UDim(), new UDim(scale, offset));
+	}
+
+	public static axis(this: void, horizontal: UDim, vertical: UDim) {
+		return new UPaddingDim(horizontal, vertical, horizontal, vertical);
+	}
+
+	public static horizontal(this: void, scale: number, offset: number) {
+		const udim = new UDim(scale, offset);
+		return new UPaddingDim(udim, udim, new UDim(), new UDim());
+	}
+
+	public static vertical(this: void, scale: number, offset: number) {
+		const udim = new UDim(scale, offset);
+		return new UPaddingDim(new UDim(), new UDim(), udim, udim);
+	}
+
+	/** @deprecated */
+	public static fromScale(this: void, scale: Padding) {
+		const { Left = 0, Right = 0, Top = 0, Bottom = 0, Vertical = 0, Horizontal = 0 } = scale;
+
+		return new UPaddingDim(
+			new UDim(Left + Horizontal, 0),
+			new UDim(Top + Vertical, 0),
+			new UDim(Right + Horizontal, 0),
+			new UDim(Bottom + Vertical, 0),
+		);
+	}
+
+	public add(other: UPaddingDim) {
+		return new UPaddingDim(
+			this.Left.add(other.Left),
+			this.Right.add(other.Right),
+			this.Top.add(other.Top),
+			this.Bottom.add(other.Bottom),
+		);
+	}
+
+	public sub(other: UPaddingDim) {
+		return new UPaddingDim(
+			this.Left.sub(other.Left),
+			this.Right.sub(other.Right),
+			this.Top.sub(other.Top),
+			this.Bottom.sub(other.Bottom),
+		);
+	}
+}
+
+/** @deprecated Now `UPaddingDim` */
+export const PaddingDim = UPaddingDim;
+export type PaddingDim = UPaddingDim;
 
 export default interface Padding {
 	Left?: number;
@@ -117,12 +176,20 @@ export default interface Padding {
 	Horizontal?: number;
 }
 export interface PaddingProps {
-	Padding: Padding | PaddingDim;
+	Padding: Padding | UPaddingDim;
+	/** @deprecated */
 	ForwardRef?: (rbx: UIPadding, padding: Padding) => void;
 }
 export default function Padding({ Padding: padding, ForwardRef: forwardRef }: PaddingProps) {
-	if (isOfVariant(padding, PaddingDim)) {
-		return <uipadding {...padding.Value} />;
+	if (padding instanceof UPaddingDim) {
+		return (
+			<uipadding
+				PaddingLeft={padding.Left}
+				PaddingTop={padding.Top}
+				PaddingRight={padding.Right}
+				PaddingBottom={padding.Bottom}
+			/>
+		);
 	}
 
 	const { Left = 0, Right = 0, Top = 0, Bottom = 0, Vertical = 0, Horizontal = 0 } = padding;

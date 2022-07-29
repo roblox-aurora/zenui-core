@@ -1,5 +1,5 @@
 import Roact, { InferEnumNames } from "@rbxts/roact";
-import Padding, { PaddingDim } from "../Utility/Padding";
+import Padding, { UPaddingDim } from "../Utility/Padding";
 import { View } from "../Views/View";
 
 export interface RowProps {
@@ -24,7 +24,7 @@ export interface RowViewProps {
 	/**
 	 * The amount of padding around the column view
 	 */
-	readonly Padding?: Padding | PaddingDim;
+	readonly Padding?: Padding | UPaddingDim;
 
 	/**
 	 * The horizontal alignment of the row
