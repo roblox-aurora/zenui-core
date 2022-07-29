@@ -1,5 +1,5 @@
 import Roact, { InferEnumNames } from "@rbxts/roact";
-import Padding, { PaddingDim } from "../Utility/Padding";
+import Padding, { UPaddingDim } from "../Utility/Padding";
 import { View } from "../Views/View";
 
 export interface ColumnProps {
@@ -24,12 +24,17 @@ export interface ColumnViewProps {
 	/**
 	 * The amount of padding around the column view
 	 */
-	readonly Padding?: Padding | PaddingDim;
+	readonly Padding?: Padding | UPaddingDim;
 
 	/**
 	 * The horizontal alignment of the column
 	 */
 	readonly HorizontalAlignment?: InferEnumNames<Enum.HorizontalAlignment> | Enum.HorizontalAlignment;
+
+	/**
+	 * The horizontal alignment of the column
+	 */
+	readonly VerticalAlignment?: InferEnumNames<Enum.VerticalAlignment> | Enum.VerticalAlignment;
 }
 /**
  * ### ZenUI::ColumnView
@@ -124,6 +129,7 @@ export class ColumnView extends Roact.Component<ColumnViewProps> {
 				<uilistlayout
 					FillDirection="Horizontal"
 					Padding={colPadding}
+					VerticalAlignment={this.props.VerticalAlignment ?? "Center"}
 					HorizontalAlignment={this.props.HorizontalAlignment ?? "Center"}
 				/>
 				{padding && <Padding Padding={padding} />}
