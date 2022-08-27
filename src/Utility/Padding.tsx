@@ -124,12 +124,12 @@ export class UPaddingDim {
 
 	public static horizontal(this: void, scale: number, offset: number) {
 		const udim = new UDim(scale, offset);
-		return new UPaddingDim(udim, udim, new UDim(), new UDim());
+		return new UPaddingDim(udim, new UDim(), udim, new UDim());
 	}
 
 	public static vertical(this: void, scale: number, offset: number) {
 		const udim = new UDim(scale, offset);
-		return new UPaddingDim(new UDim(), new UDim(), udim, udim);
+		return new UPaddingDim(new UDim(), udim, new UDim(), udim);
 	}
 
 	/** @deprecated */
