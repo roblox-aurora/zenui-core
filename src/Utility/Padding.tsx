@@ -147,8 +147,8 @@ export class UPaddingDim {
 	public add(other: UPaddingDim) {
 		return new UPaddingDim(
 			this.Left.add(other.Left),
-			this.Right.add(other.Right),
 			this.Top.add(other.Top),
+			this.Right.add(other.Right),
 			this.Bottom.add(other.Bottom),
 		);
 	}
