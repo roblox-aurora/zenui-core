@@ -1,8 +1,11 @@
-import Roact, { InferEnumNames } from "@rbxts/roact";
+import Roact from "@rbxts/roact";
 import Padding from "../Utility/Padding";
+import { InferEnumNames } from "../Utility/Types";
 import { View, ViewProps } from "./View";
 
 export interface ListViewDefaultProps {
+	readonly Size: UDim2;
+
 	readonly FillDirection: InferEnumNames<Enum.FillDirection>;
 	/**
 	 * Automatically size to the direction of the `FillDirection` given
@@ -12,9 +15,9 @@ export interface ListViewDefaultProps {
 
 export interface ListViewProps extends Pick<ViewProps, "Position" | "AnchorPoint">, ListViewDefaultProps {
 	readonly ItemPadding?: number | UDim;
-	readonly Size?: UDim2;
-	readonly HorizontalAlignment?: InferEnumNames<Enum.HorizontalAlignment> | Enum.HorizontalAlignment;
-	readonly VerticalAlignment?: InferEnumNames<Enum.VerticalAlignment> | Enum.VerticalAlignment;
+
+	readonly HorizontalAlignment?: InferEnumNames<Enum.HorizontalAlignment>;
+	readonly VerticalAlignment?: InferEnumNames<Enum.VerticalAlignment>;
 	readonly Padding?: Padding;
 }
 
@@ -33,6 +36,7 @@ export class ListView extends Roact.Component<ListViewProps> {
 	public static defaultProps: ListViewDefaultProps = {
 		FillDirection: "Vertical",
 		AutomaticSize: false,
+		Size: new UDim2(1, 0, 1, 0),
 	};
 
 	public constructor(props: ListViewProps) {
@@ -42,13 +46,7 @@ export class ListView extends Roact.Component<ListViewProps> {
 	}
 
 	public render(): Roact.Element | undefined {
-		const {
-			FillDirection,
-			AutomaticSize,
-			Size = new UDim2(1, 0, 1, 0),
-			Padding: padding,
-			ItemPadding,
-		} = this.props;
+		const { FillDirection, AutomaticSize, Size, Padding: padding, ItemPadding } = this.props;
 
 		const children = this.props[Roact.Children];
 		if (children) {
