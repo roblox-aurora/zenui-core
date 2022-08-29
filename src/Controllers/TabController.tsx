@@ -1,17 +1,39 @@
 import Roact from "@rbxts/roact";
+import { InferEnumNames } from "../Utility/Types";
 import { View } from "../Views/View";
 
 export type InferTabProps<T> = T extends (props: infer A) => Roact.Element ? A : never;
 
 export interface TabControllerRenderRequest<P> {
+	/**
+	 * The properties for this tab item
+	 */
 	readonly TabItem: P;
+
+	/**
+	 * Whether or not this particular tab is considered active
+	 */
 	readonly IsActive: boolean;
+	/**
+	 * A function that invokes the tab click inside the tab controller
+	 */
 	readonly TabClickDelegate: () => void;
 }
 
 export interface TabControllerRenderContainerRequests<TTabViewComponent extends ComponentLike> {
+	/**
+	 * The tab components passed into the tab controller
+	 */
 	readonly Tabs: Roact.Children;
+
+	/**
+	 * Other components passed into the tab controller that aren't tabs
+	 */
 	readonly Other: Roact.Children;
+
+	/**
+	 * The props for the tab controller itself
+	 */
 	readonly Props: TabControllerProps<TTabViewComponent>;
 }
 
@@ -21,10 +43,26 @@ interface TabControllerDefaultProps<TTabViewComponent extends ComponentLike> {}
 
 export interface TabControllerProps<TTabViewComponent extends ComponentLike>
 	extends TabControllerDefaultProps<TTabViewComponent> {
-	Size?: UDim2;
-	Position?: UDim2;
-	TabDirection: Roact.InferEnumNames<Enum.FillDirection>;
-	TabPadding?: UDim;
+	/**
+	 * The size of the tab controller
+	 */
+	readonly Size?: UDim2;
+
+	/**
+	 * The position of the tab controller
+	 */
+	readonly Position?: UDim2;
+
+	/**
+	 * The direction the tabs are laid out in the tab controller
+	 */
+	readonly TabDirection: InferEnumNames<Enum.FillDirection>;
+
+	/**
+	 * The padding around the tabs
+	 */
+	readonly TabPadding?: UDim;
+
 	/**
 	 * Your tab component type - the props of that component will be passed to the tab container render function (to handle rendering)
 	 */
