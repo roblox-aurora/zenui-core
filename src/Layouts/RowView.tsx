@@ -1,12 +1,23 @@
-import Roact, { InferEnumNames } from "@rbxts/roact";
+import Roact from "@rbxts/roact";
 import Padding, { UPaddingDim } from "../Utility/Padding";
+import { RoactEnum } from "../Utility/Types";
 import { View } from "../Views/View";
 
 export interface RowProps {
-	Height?: UDim;
-	VerticalAlignment?: Roact.InferEnumNames<Enum.VerticalAlignment> | Enum.VerticalAlignment;
-	HorizontalAlignment?: Roact.InferEnumNames<Enum.HorizontalAlignment> | Enum.HorizontalAlignment;
+	/**
+	 * The height of this row
+	 */
+	readonly Height?: UDim;
+	/**
+	 * The vertical alignment of the contents in this row
+	 */
+	readonly VerticalAlignment?: RoactEnum<Enum.VerticalAlignment>;
+	/**
+	 * The horizontal alignment of the contents in this row
+	 */
+	readonly HorizontalAlignment?: RoactEnum<Enum.HorizontalAlignment>;
 }
+
 /**
  * Represents a Row in a `<RowView/>` ({@link RowView})
  * @hidden
@@ -15,8 +26,19 @@ export function Row(props: Roact.PropsWithChildren<RowProps>) {
 	return <>{props[Roact.Children]}</>;
 }
 
-export interface RowViewProps {
-	readonly Size?: UDim2;
+interface RowViewDefaultProps {
+	/**
+	 * The size of this row view container
+	 */
+	readonly Size: UDim2;
+
+	/**
+	 * The width of the rows (if not set, will be automatic)
+	 */
+	readonly RowWidth: UDim;
+}
+
+export interface RowViewProps extends RowViewDefaultProps {
 	/**
 	 * The amount of spacing between each column. If you want outer padding on the column view, use `Padding`.
 	 */
@@ -29,7 +51,7 @@ export interface RowViewProps {
 	/**
 	 * The horizontal alignment of the row
 	 */
-	readonly VerticalAlignment?: InferEnumNames<Enum.VerticalAlignment> | Enum.VerticalAlignment;
+	readonly VerticalAlignment?: RoactEnum<Enum.VerticalAlignment>;
 }
 /**
  * ### ZenUI::RowView
@@ -41,6 +63,11 @@ export interface RowViewProps {
  * etc.
  */
 export class RowView extends Roact.Component<RowViewProps> {
+	public static defaultProps: RowViewDefaultProps = {
+		RowWidth: new UDim(),
+		Size: new UDim2(1, 0, 1, 0),
+	};
+
 	/**
 	 * Represents a Row in a `<RowView/>` ({@link RowView})
 	 */
@@ -86,15 +113,20 @@ export class RowView extends Roact.Component<RowViewProps> {
 						<View
 							Size={
 								props.Height
-									? new UDim2(1, 0, props.Height.Scale, props.Height.Offset)
+									? new UDim2(
+											this.props.RowWidth.Scale,
+											this.props.RowWidth.Offset,
+											props.Height.Scale,
+											props.Height.Offset,
+									  )
 									: new UDim2(
-											0,
-											0,
+											this.props.RowWidth.Scale,
+											this.props.RowWidth.Offset,
 											(1 + scaleOffset) * (1 / autoSizeCount),
 											widthOffset / autoSizeCount,
 									  )
 							}
-							AutomaticSize="X"
+							AutomaticSize={this.props.RowWidth !== new UDim() ? "X" : "None"}
 						>
 							<uilistlayout
 								VerticalAlignment={
@@ -113,7 +145,7 @@ export class RowView extends Roact.Component<RowViewProps> {
 		}
 
 		return (
-			<View Size={this.props.Size ?? new UDim2(0, 0, 1, 0)} AutomaticSize="X">
+			<View Size={this.props.Size} AutomaticSize="X">
 				<uilistlayout
 					FillDirection="Vertical"
 					Padding={colPadding}

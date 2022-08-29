@@ -1,11 +1,21 @@
-import Roact, { InferEnumNames } from "@rbxts/roact";
+import Roact from "@rbxts/roact";
 import Padding, { UPaddingDim } from "../Utility/Padding";
+import { RoactEnum } from "../Utility/Types";
 import { View } from "../Views/View";
 
 export interface ColumnProps {
-	Width?: UDim;
-	VerticalAlignment?: Roact.InferEnumNames<Enum.VerticalAlignment> | Enum.VerticalAlignment;
-	HorizontalAlignment?: Roact.InferEnumNames<Enum.HorizontalAlignment> | Enum.HorizontalAlignment;
+	/**
+	 * The width of this column
+	 */
+	readonly Width?: UDim;
+	/**
+	 * The vertical alignment of the contents in this column
+	 */
+	readonly VerticalAlignment?: RoactEnum<Enum.VerticalAlignment>;
+	/**
+	 * The horizontal alignment of the contents in this column
+	 */
+	readonly HorizontalAlignment?: RoactEnum<Enum.HorizontalAlignment>;
 }
 /**
  * Represents a Column in a `<ColumnView/>` ({@link ColumnView})
@@ -15,8 +25,19 @@ export function Column(props: Roact.PropsWithChildren<ColumnProps>) {
 	return <>{props[Roact.Children]}</>;
 }
 
-export interface ColumnViewProps {
-	readonly Size?: UDim2;
+interface ColumnViewDefaultProps {
+	/**
+	 * The height of the columns (if not set, will be automatic)
+	 */
+	readonly ColumnHeight: UDim;
+
+	/**
+	 * The size of this column view container
+	 */
+	readonly Size: UDim2;
+}
+
+export interface ColumnViewProps extends ColumnViewDefaultProps {
 	/**
 	 * The amount of spacing between each column. If you want outer padding on the column view, use `Padding`.
 	 */
@@ -29,12 +50,12 @@ export interface ColumnViewProps {
 	/**
 	 * The horizontal alignment of the column
 	 */
-	readonly HorizontalAlignment?: InferEnumNames<Enum.HorizontalAlignment> | Enum.HorizontalAlignment;
+	readonly HorizontalAlignment?: RoactEnum<Enum.HorizontalAlignment>;
 
 	/**
 	 * The horizontal alignment of the column
 	 */
-	readonly VerticalAlignment?: InferEnumNames<Enum.VerticalAlignment> | Enum.VerticalAlignment;
+	readonly VerticalAlignment?: RoactEnum<Enum.VerticalAlignment>;
 }
 /**
  * ### ZenUI::ColumnView
@@ -53,6 +74,11 @@ export interface ColumnViewProps {
  * etc.
  */
 export class ColumnView extends Roact.Component<ColumnViewProps> {
+	public static defaultProps: ColumnViewDefaultProps = {
+		ColumnHeight: new UDim(),
+		Size: new UDim2(1, 0, 1, 0),
+	};
+
 	/**
 	 * Represents a Column in a `<ColumnView/>` ({@link ColumnView})
 	 */
@@ -98,15 +124,20 @@ export class ColumnView extends Roact.Component<ColumnViewProps> {
 						<View
 							Size={
 								props.Width
-									? new UDim2(props.Width.Scale, props.Width.Offset, 0, 0)
+									? new UDim2(
+											props.Width.Scale,
+											props.Width.Offset,
+											this.props.ColumnHeight.Scale,
+											this.props.ColumnHeight.Offset,
+									  )
 									: new UDim2(
 											(1 + scaleOffset) * (1 / autoSizeCount),
 											widthOffset / autoSizeCount,
-											0,
-											0,
+											this.props.ColumnHeight.Scale,
+											this.props.ColumnHeight.Offset,
 									  )
 							}
-							AutomaticSize="Y"
+							AutomaticSize={this.props.ColumnHeight !== new UDim() ? "Y" : "None"}
 						>
 							<uilistlayout
 								VerticalAlignment={props.VerticalAlignment}
@@ -125,7 +156,7 @@ export class ColumnView extends Roact.Component<ColumnViewProps> {
 		}
 
 		return (
-			<View Size={this.props.Size ?? new UDim2(1, 0, 0, 0)} AutomaticSize="Y">
+			<View Size={this.props.Size} AutomaticSize="Y">
 				<uilistlayout
 					FillDirection="Horizontal"
 					Padding={colPadding}
