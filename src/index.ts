@@ -7,6 +7,7 @@ export * from "./Controllers/TabController";
 export * from "./Layouts/ColumnView";
 export * from "./Layouts/RowView";
 export * from "./Utility/Padding";
+export * from "./Utility/Types";
 export * from "./Views/ListView";
 export * from "./Views/View";
 export * from "./Widgets/AutoSizedText";
