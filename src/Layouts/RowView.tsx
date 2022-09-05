@@ -52,6 +52,16 @@ export interface RowViewProps extends RowViewDefaultProps {
 	 * The horizontal alignment of the row
 	 */
 	readonly VerticalAlignment?: RoactEnum<Enum.VerticalAlignment>;
+
+	/**
+	 * The maximum size this row view can be
+	 */
+	readonly MaxSize?: Vector2;
+
+	/**
+	 * The minimum size this row view can be
+	 */
+	readonly MinSize?: Vector2;
 }
 /**
  * ### ZenUI::RowView
@@ -111,6 +121,7 @@ export class RowView extends Roact.Component<RowViewProps> {
 					containerMap.set(
 						key,
 						<View
+							LayoutOrder={idx}
 							Size={
 								props.Height
 									? new UDim2(
@@ -147,11 +158,20 @@ export class RowView extends Roact.Component<RowViewProps> {
 		return (
 			<View Size={this.props.Size} AutomaticSize="X">
 				<uilistlayout
+					Key="RowLayout"
+					SortOrder="LayoutOrder"
 					FillDirection="Vertical"
 					Padding={colPadding}
 					VerticalAlignment={this.props.VerticalAlignment ?? "Center"}
 				/>
-				{padding && <Padding Padding={padding} />}
+				{(this.props.MinSize !== undefined || this.props.MaxSize !== undefined) && (
+					<uisizeconstraint
+						Key="RowSizeConstraint"
+						MinSize={this.props.MinSize}
+						MaxSize={this.props.MaxSize}
+					/>
+				)}
+				{padding && <Padding Key="RowPadding" Padding={padding} />}
 				{containerMap}
 			</View>
 		);

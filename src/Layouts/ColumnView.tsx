@@ -56,6 +56,16 @@ export interface ColumnViewProps extends ColumnViewDefaultProps {
 	 * The horizontal alignment of the column
 	 */
 	readonly VerticalAlignment?: RoactEnum<Enum.VerticalAlignment>;
+
+	/**
+	 * The maximum size this column view can be
+	 */
+	readonly MaxSize?: Vector2;
+
+	/**
+	 * The minimum size this column view can be
+	 */
+	readonly MinSize?: Vector2;
 }
 /**
  * ### ZenUI::ColumnView
@@ -122,6 +132,7 @@ export class ColumnView extends Roact.Component<ColumnViewProps> {
 					containerMap.set(
 						key,
 						<View
+							LayoutOrder={idx}
 							Size={
 								props.Width
 									? new UDim2(
@@ -158,12 +169,21 @@ export class ColumnView extends Roact.Component<ColumnViewProps> {
 		return (
 			<View Size={this.props.Size} AutomaticSize="Y">
 				<uilistlayout
+					Key="ColumnLayout"
 					FillDirection="Horizontal"
 					Padding={colPadding}
+					SortOrder="LayoutOrder"
 					VerticalAlignment={this.props.VerticalAlignment ?? "Center"}
 					HorizontalAlignment={this.props.HorizontalAlignment ?? "Center"}
 				/>
-				{padding && <Padding Padding={padding} />}
+				{(this.props.MinSize !== undefined || this.props.MaxSize !== undefined) && (
+					<uisizeconstraint
+						Key="ColumnSizeConstraint"
+						MinSize={this.props.MinSize}
+						MaxSize={this.props.MaxSize}
+					/>
+				)}
+				{padding && <Padding Key="ColumnPadding" Padding={padding} />}
 				{containerMap}
 			</View>
 		);
