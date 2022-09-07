@@ -167,7 +167,7 @@ export class ColumnView extends Roact.Component<ColumnViewProps> {
 		}
 
 		return (
-			<View Size={this.props.Size} AutomaticSize={this.props.ColumnHeight !== new UDim() ? "None" : "Y"}>
+			<View Size={this.props.Size} AutomaticSize="Y">
 				<uilistlayout
 					Key="ColumnLayout"
 					FillDirection="Horizontal"
