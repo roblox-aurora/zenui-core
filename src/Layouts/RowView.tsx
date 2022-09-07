@@ -137,7 +137,7 @@ export class RowView extends Roact.Component<RowViewProps> {
 											widthOffset / autoSizeCount,
 									  )
 							}
-							AutomaticSize={this.props.RowWidth !== new UDim() ? "X" : "None"}
+							AutomaticSize={this.props.RowWidth === new UDim() ? "X" : "None"}
 						>
 							<uilistlayout
 								VerticalAlignment={
@@ -156,7 +156,7 @@ export class RowView extends Roact.Component<RowViewProps> {
 		}
 
 		return (
-			<View Size={this.props.Size} AutomaticSize="X">
+			<View Size={this.props.Size} AutomaticSize={this.props.RowWidth !== new UDim() ? "None" : "X"}>
 				<uilistlayout
 					Key="RowLayout"
 					SortOrder="LayoutOrder"
