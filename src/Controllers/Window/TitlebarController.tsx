@@ -4,9 +4,9 @@ export interface TitlebarControllerDefaultProps {}
 export interface TitlebarControllerProps extends TitlebarControllerDefaultProps {}
 
 /**
- * ### ZenUI::WindowController
+ * ### ZenUI::TitlebarController
  *
- * An object that behaves like a window - can be dragged, have a titlebar etc.
+ * When under a window, will take precedence for dragging etc. unless explicitly defined not to
  */
 export class TitlebarController extends Roact.Component<TitlebarControllerProps> {
 	public static defaultProps: TitlebarControllerDefaultProps = {};

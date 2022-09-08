@@ -69,6 +69,8 @@ export class UPaddingDim {
 		public readonly Bottom: UDim,
 	) {}
 
+	public static readonly zero = UPaddingDim.axis(new UDim(), new UDim());
+
 	/** @deprecated */
 	public static from(this: void, scale: Padding, offset: Padding) {
 		const { Left = 0, Right = 0, Top = 0, Bottom = 0, Vertical = 0, Horizontal = 0 } = scale;

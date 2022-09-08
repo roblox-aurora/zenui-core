@@ -4,6 +4,8 @@
 
 export * from "./Controllers/Groups/PageController";
 export * from "./Controllers/Groups/TabController";
+export * from "./Controllers/Window/TitlebarController";
+export * from "./Controllers/Window/WindowController";
 export * from "./Layouts/ColumnView";
 export * from "./Layouts/RowView";
 export * from "./Utility/Padding";
