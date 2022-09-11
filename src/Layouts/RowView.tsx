@@ -16,6 +16,11 @@ export interface RowProps {
 	 * The horizontal alignment of the contents in this row
 	 */
 	readonly HorizontalAlignment?: RoactEnum<Enum.HorizontalAlignment>;
+
+	/**
+	 * The padding between the items in the row
+	 */
+	readonly LayoutPadding?: UDim;
 }
 
 /**
@@ -145,6 +150,7 @@ export class RowView extends Roact.Component<RowViewProps> {
 									(idx === 0 ? "Top" : idx === count - 1 ? "Bottom" : "Center")
 								}
 								HorizontalAlignment={props.HorizontalAlignment}
+								Padding={props.LayoutPadding}
 							/>
 							{child}
 						</View>,

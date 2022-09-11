@@ -16,6 +16,11 @@ export interface ColumnProps {
 	 * The horizontal alignment of the contents in this column
 	 */
 	readonly HorizontalAlignment?: RoactEnum<Enum.HorizontalAlignment>;
+
+	/**
+	 * The padding between items in the column
+	 */
+	readonly LayoutPadding?: UDim;
 }
 /**
  * Represents a Column in a `<ColumnView/>` ({@link ColumnView})
@@ -156,6 +161,7 @@ export class ColumnView extends Roact.Component<ColumnViewProps> {
 									props.HorizontalAlignment ??
 									(idx === 0 ? "Left" : idx === count - 1 ? "Right" : "Center")
 								}
+								Padding={props.LayoutPadding}
 							/>
 							{child}
 						</View>,
