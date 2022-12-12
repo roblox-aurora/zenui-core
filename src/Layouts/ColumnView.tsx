@@ -1,6 +1,6 @@
-import Roact from "@rbxts/roact";
+import Roact, { Children } from "@rbxts/roact";
 import Padding, { UPaddingDim } from "../Utility/Padding";
-import { RoactEnum } from "../Utility/Types";
+import { ElementOf, InferProps, isArray, RoactEnum } from "../Utility/Types";
 import { View } from "../Views/View";
 
 export interface ColumnProps {
@@ -98,6 +98,33 @@ export class ColumnView extends Roact.Component<ColumnViewProps> {
 	 * Represents a Column in a `<ColumnView/>` ({@link ColumnView})
 	 */
 	public static Column = Column;
+
+	/**
+	 * Creates columns more dynamically given the input elements
+	 */
+	public static createColumnsFromElements<T extends Roact.AnyComponent>(
+		values: Roact.Element[],
+		elementKind: T | T[],
+		getColumnId: (value: ElementOf<T>, index: number) => number,
+	) {
+		const elements = new Array<Roact.Element[]>();
+
+		let i = 0;
+		for (const value of values) {
+			const isElement = isArray(elementKind)
+				? elementKind.includes(value.component as T)
+				: value.component === elementKind;
+			if (isElement) {
+				const columnIdx = getColumnId(value as ElementOf<T>, i);
+				(elements[columnIdx] ??= []).push(value);
+				i++;
+			}
+		}
+
+		return elements.map((children) => <ColumnView.Column>{children}</ColumnView.Column>) as ElementOf<
+			typeof Column
+		>[];
+	}
 
 	public render(): Roact.Element | undefined {
 		const children = this.props[Roact.Children];

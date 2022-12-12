@@ -45,6 +45,7 @@
   "dependencies": {
     "@rbxts/roact": "*",
     "@rbxts/services": "^1.2.0",
+    "@rbxts/t": "^3.0.0",
     "@rbxts/variant": "^1.0.1"
   }
 }

@@ -1,4 +1,5 @@
 import Roact from "@rbxts/roact";
+import { t } from "@rbxts/t";
 
 export type InferEnumNames<TEnum extends EnumItem> = TEnum extends { Name: infer TName; EnumType: Enum; Value: number }
 	? TName
@@ -15,4 +16,14 @@ export type InferProps<T> = T extends (props: infer A) => Roact.Element
 	? A
 	: T extends Roact.Component<infer A>
 	? A
+	: T extends Roact.HostComponent
+	? Partial<CreatableInstances[T]>
 	: never;
+
+export interface ElementOf<T extends Roact.AnyComponent> extends Roact.Element {
+	component: T;
+	props: InferProps<T>;
+}
+
+/** @internal */
+export const isArray = t.array(t.any);
