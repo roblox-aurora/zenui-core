@@ -1,8 +1,6 @@
 import Roact from "@rbxts/roact";
-import { InferEnumNames } from "../Utility/Types";
+import { ComponentLike, InferEnumNames, InferProps } from "../Utility/Types";
 import { View } from "../Views/View";
-
-export type InferTabProps<T> = T extends (props: infer A) => Roact.Element ? A : never;
 
 export interface TabControllerRenderRequest<P> {
 	/**
@@ -37,8 +35,6 @@ export interface TabControllerRenderContainerRequests<TTabViewComponent extends 
 	readonly Props: TabControllerProps<TTabViewComponent>;
 }
 
-type ComponentLike = Roact.FunctionComponent<any> | Roact.Component<any, any>;
-
 interface TabControllerDefaultProps<TTabViewComponent extends ComponentLike> {}
 
 export interface TabControllerProps<TTabViewComponent extends ComponentLike>
@@ -71,11 +67,11 @@ export interface TabControllerProps<TTabViewComponent extends ComponentLike>
 	/**
 	 * Will pass each tab component's (specified in `TabComponent`) props - in which you can use to render the tab.
 	 */
-	RenderTabItem: (req: TabControllerRenderRequest<InferTabProps<TTabViewComponent>>) => Roact.Element;
+	RenderTabItem: (req: TabControllerRenderRequest<InferProps<TTabViewComponent>>) => Roact.Element;
 	/**
 	 * Handle the tab being clicked - This is invoked by the `TabClickedDelegate` in {@link TabControllerRenderRequest} that's passed to `RenderTabItem`
 	 */
-	OnTabClicked: (clickedTabIndex: number, clickedTabProps: InferTabProps<TTabViewComponent>) => void;
+	OnTabClicked: (clickedTabIndex: number, clickedTabProps: InferProps<TTabViewComponent>) => void;
 
 	/**
 	 * Custom renderer for the tab container - will give all elements provided + the props provided to the renderer
@@ -107,9 +103,9 @@ export class TabController<TTabViewComponent extends ComponentLike> extends Roac
 				elements.set(
 					key,
 					this.props.RenderTabItem({
-						TabItem: child.props as InferTabProps<TTabViewComponent>,
+						TabItem: child.props as InferProps<TTabViewComponent>,
 						TabClickDelegate: () =>
-							this.props.OnTabClicked(currTabIndex, child.props as InferTabProps<TTabViewComponent>),
+							this.props.OnTabClicked(currTabIndex, child.props as InferProps<TTabViewComponent>),
 						IsActive: this.props.SelectedTabIndex === tabIndex,
 					}),
 				);

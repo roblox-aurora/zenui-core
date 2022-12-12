@@ -1,11 +1,11 @@
 {
   "name": "@rbxts/zenui-core",
-  "version": "0.5.9",
+  "version": "0.6.0",
   "description": "",
   "main": "out/init.lua",
   "scripts": {
-    "build": "rbxtsc",
-    "watch": "rbxtsc -w",
+    "build": "cross-env NODE_ENV=production rbxtsc",
+    "watch": "cross-env NODE_ENV=development rbxtsc -w",
     "prepublishOnly": "npm run generate-barrels && npm run build",
     "generate-barrels": "barrelsby --delete -c barrelsby.json",
     "yalc": "npm run prepublishOnly && yalc push"
@@ -26,17 +26,21 @@
     "access": "public"
   },
   "devDependencies": {
-    "@rbxts/compiler-types": "^1.3.3-types.1",
-    "@rbxts/types": "^1.0.589",
+    "@rbxts/compiler-types": "^2.0.4-types.0",
+    "@rbxts/types": "^1.0.649",
     "@typescript-eslint/eslint-plugin": "^5.22.0",
     "@typescript-eslint/parser": "^5.22.0",
     "barrelsby": "^2.3.4",
+    "cross-env": "^7.0.3",
     "eslint": "^8.15.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-roblox-ts": "^0.0.32",
     "prettier": "^2.6.2",
-    "typescript": "^4.6.4"
+    "rbxts-transform-debug": "^2.0.3",
+    "rbxts-transform-env": "^2.0.4",
+    "roblox-ts": "^2.0.4",
+    "typescript": "~4.8.4"
   },
   "dependencies": {
     "@rbxts/roact": "*",
