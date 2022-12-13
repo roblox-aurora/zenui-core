@@ -1,6 +1,6 @@
 import Roact, { Children } from "@rbxts/roact";
 import Padding, { UPaddingDim } from "../Utility/Padding";
-import { ElementOf, InferProps, isArray, RoactEnum } from "../Utility/Types";
+import { ElementOf, InferEnumNames, InferProps, isArray, RoactEnum } from "../Utility/Types";
 import { View } from "../Views/View";
 
 export interface ColumnProps {
@@ -21,6 +21,11 @@ export interface ColumnProps {
 	 * The padding between items in the column
 	 */
 	readonly LayoutPadding?: UDim;
+
+	/**
+	 * The layout order of the children of this column
+	 */
+	readonly SortOrder?: InferEnumNames<Enum.SortOrder> | Enum.SortOrder;
 }
 /**
  * Represents a Column in a `<ColumnView/>` ({@link ColumnView})
@@ -189,6 +194,7 @@ export class ColumnView extends Roact.Component<ColumnViewProps> {
 									(idx === 0 ? "Left" : idx === count - 1 ? "Right" : "Center")
 								}
 								Padding={props.LayoutPadding}
+								SortOrder={props.SortOrder}
 							/>
 							{child}
 						</View>,
