@@ -1,8 +1,10 @@
 import Roact from "@rbxts/roact";
+import { InferEnumNames } from "../Utility/Types";
 
 export interface PageControllerProps {
 	Size?: UDim2;
 	Position?: UDim2;
+	SortOrder?: InferEnumNames<Enum.SortOrder> | Enum.SortOrder;
 	SelectedPageIndex: number;
 	TabIndexChanged?: (index: number) => void;
 }
@@ -49,7 +51,12 @@ export class PageController extends Roact.PureComponent<PageControllerProps, Pag
 
 		return (
 			<frame ZIndex={2} ClipsDescendants BackgroundTransparency={1} Size={ContentSize} Position={ContentPosition}>
-				<uipagelayout ScrollWheelInputEnabled={false} Animated={false} Ref={(page) => (this.page = page)} />
+				<uipagelayout
+					SortOrder={this.props.SortOrder}
+					ScrollWheelInputEnabled={false}
+					Animated={false}
+					Ref={(page) => (this.page = page)}
+				/>
 				{children}
 			</frame>
 		);

@@ -161,6 +161,8 @@ export class ColumnView extends Roact.Component<ColumnViewProps> {
 			widthOffset -= colPadding.Offset * (seperatorCount / children.size());
 			scaleOffset -= colPadding.Scale * (seperatorCount / children.size());
 
+			const useAutomaticSize = this.props.ColumnHeight === new UDim();
+
 			let idx = 0;
 			const count = children.size();
 			for (const [key, child] of children) {
@@ -185,7 +187,7 @@ export class ColumnView extends Roact.Component<ColumnViewProps> {
 											this.props.ColumnHeight.Offset,
 									  )
 							}
-							AutomaticSize={this.props.ColumnHeight === new UDim() ? "Y" : "None"}
+							AutomaticSize={useAutomaticSize ? "Y" : "None"}
 						>
 							<uilistlayout
 								VerticalAlignment={props.VerticalAlignment}
