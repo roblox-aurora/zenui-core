@@ -2,11 +2,20 @@ import Roact from "@rbxts/roact";
 import { ComponentLike, InferEnumNames, InferProps } from "../Utility/Types";
 import { View } from "../Views/View";
 
+export interface SortableTabProps {
+	readonly TabIndex: number;
+}
+
 export interface TabControllerRenderRequest<P> {
 	/**
 	 * The properties for this tab item
 	 */
 	readonly TabItem: P;
+
+	/**
+	 * The layout order of this tab
+	 */
+	readonly LayoutOrder: number;
 
 	/**
 	 * Whether or not this particular tab is considered active
@@ -18,7 +27,7 @@ export interface TabControllerRenderRequest<P> {
 	readonly TabClickDelegate: () => void;
 }
 
-export interface TabControllerRenderContainerRequests<TTabViewComponent extends ComponentLike> {
+export interface TabControllerRenderContainerRequests<TTabViewComponent extends ComponentLike<SortableTabProps>> {
 	/**
 	 * The tab components passed into the tab controller
 	 */
@@ -35,10 +44,12 @@ export interface TabControllerRenderContainerRequests<TTabViewComponent extends 
 	readonly Props: TabControllerProps<TTabViewComponent>;
 }
 
-interface TabControllerDefaultProps<TTabViewComponent extends ComponentLike> {}
+interface TabControllerDefaultProps {
+	readonly TabSortOrder: InferEnumNames<Enum.SortOrder> | Enum.SortOrder;
+}
 
-export interface TabControllerProps<TTabViewComponent extends ComponentLike>
-	extends TabControllerDefaultProps<TTabViewComponent> {
+export interface TabControllerProps<TTabViewComponent extends ComponentLike<SortableTabProps>>
+	extends TabControllerDefaultProps {
 	/**
 	 * The size of the tab controller
 	 */
@@ -87,6 +98,10 @@ export interface TabControllerProps<TTabViewComponent extends ComponentLike>
 export class TabController<TTabViewComponent extends ComponentLike> extends Roact.PureComponent<
 	TabControllerProps<TTabViewComponent>
 > {
+	public static defaultProps: TabControllerDefaultProps = {
+		TabSortOrder: "LayoutOrder",
+	};
+
 	public render() {
 		const elements = new Map<string | number, Roact.Element>();
 
@@ -100,10 +115,13 @@ export class TabController<TTabViewComponent extends ComponentLike> extends Roac
 			// If tab view, we'll render as a tab
 			if (child.component === this.props.TabComponent) {
 				const currTabIndex = tabIndex;
+				const currTabProps = child.props as SortableTabProps;
+
 				elements.set(
 					key,
 					this.props.RenderTabItem({
-						TabItem: child.props as InferProps<TTabViewComponent>,
+						LayoutOrder: currTabProps.TabIndex,
+						TabItem: currTabProps as InferProps<TTabViewComponent>,
 						TabClickDelegate: () =>
 							this.props.OnTabClicked(currTabIndex, child.props as InferProps<TTabViewComponent>),
 						IsActive: this.props.SelectedTabIndex === tabIndex,
@@ -123,7 +141,11 @@ export class TabController<TTabViewComponent extends ComponentLike> extends Roac
 		} else {
 			return (
 				<View Size={this.props.Size} Position={this.props.Position}>
-					<uilistlayout Padding={this.props.TabPadding} FillDirection={this.props.TabDirection} />
+					<uilistlayout
+						SortOrder={this.props.TabSortOrder}
+						Padding={this.props.TabPadding}
+						FillDirection={this.props.TabDirection}
+					/>
 					{children}
 					{elements}
 				</View>

@@ -52,7 +52,7 @@ export class PageController extends Roact.PureComponent<PageControllerProps, Pag
 		return (
 			<frame ZIndex={2} ClipsDescendants BackgroundTransparency={1} Size={ContentSize} Position={ContentPosition}>
 				<uipagelayout
-					SortOrder={this.props.SortOrder}
+					SortOrder={this.props.SortOrder ?? Enum.SortOrder.LayoutOrder}
 					ScrollWheelInputEnabled={false}
 					Animated={false}
 					Ref={(page) => (this.page = page)}
