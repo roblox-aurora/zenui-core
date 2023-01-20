@@ -8,6 +8,17 @@ export interface ColumnProps {
 	 * The width of this column
 	 */
 	readonly Width?: UDim;
+
+	/**
+	 * The maximum width of this column
+	 */
+	readonly MaxWidth?: number;
+
+	/**
+	 * The minimum width of this column
+	 */
+	readonly MinWidth?: number;
+
 	/**
 	 * The vertical alignment of the contents in this column
 	 */
@@ -189,6 +200,17 @@ export class ColumnView extends Roact.Component<ColumnViewProps> {
 							}
 							AutomaticSize={useAutomaticSize ? "Y" : "None"}
 						>
+							{(props.MaxWidth !== undefined || props.MinWidth !== undefined) && (
+								<uisizeconstraint
+									Key="ColumnItemSizeConstraint"
+									MinSize={props.MinWidth !== undefined ? new Vector2(props.MinWidth, 0) : undefined}
+									MaxSize={
+										props.MaxWidth !== undefined
+											? new Vector2(props.MaxWidth, math.huge)
+											: undefined
+									}
+								/>
+							)}
 							<uilistlayout
 								VerticalAlignment={props.VerticalAlignment}
 								HorizontalAlignment={

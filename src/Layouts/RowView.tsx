@@ -8,6 +8,16 @@ export interface RowProps {
 	 * The height of this row
 	 */
 	readonly Height?: UDim;
+
+	/**
+	 * The maximum height of this row
+	 */
+	readonly MaxHeight?: number;
+	/**
+	 * The minimum height of this row
+	 */
+	readonly MinHeight?: number;
+
 	/**
 	 * The vertical alignment of the contents in this row
 	 */
@@ -149,6 +159,19 @@ export class RowView extends Roact.Component<RowViewProps> {
 							}
 							AutomaticSize={this.props.RowWidth === new UDim() ? "X" : "None"}
 						>
+							{(props.MaxHeight !== undefined || props.MinHeight !== undefined) && (
+								<uisizeconstraint
+									Key="ColumnItemSizeConstraint"
+									MinSize={
+										props.MinHeight !== undefined ? new Vector2(0, props.MinHeight) : undefined
+									}
+									MaxSize={
+										props.MaxHeight !== undefined
+											? new Vector2(math.huge, props.MaxHeight)
+											: undefined
+									}
+								/>
+							)}
 							<uilistlayout
 								VerticalAlignment={
 									props.VerticalAlignment ??
