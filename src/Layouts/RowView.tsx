@@ -14,10 +14,10 @@ export interface RowProps {
 	 */
 	readonly MaxHeight?: number;
 
-	// /**
-	//  * Automatic Height
-	//  */
-	// readonly AutomaticHeight?: boolean;
+	/**
+	 * Automatic Height
+	 */
+	readonly AutomaticHeight?: boolean;
 
 	/**
 	 * The minimum height of this row
@@ -67,6 +67,11 @@ interface RowViewDefaultProps {
 	 * The width of the rows (if not set, will be automatic)
 	 */
 	readonly RowWidth: UDim;
+
+	/**
+	 * Automatic sizing rules
+	 */
+	readonly AutomaticSize?: Enum.AutomaticSize | InferEnumNames<Enum.AutomaticSize>;
 
 	/**
 	 * Whether or not this `RowView` scrols
@@ -174,27 +179,38 @@ export class RowView extends Roact.Component<RowViewProps> {
 				if (child.component === Row) {
 					const props = child.props as RowProps;
 
+					let height: UDim2;
+					let automaticSize: Enum.AutomaticSize = Enum.AutomaticSize.None;
+					const shouldAutoX = this.props.RowWidth === new UDim();
+					const shouldAutoY = props.AutomaticHeight === true;
+
+					if (props.Height) {
+						height = new UDim2(
+							this.props.RowWidth.Scale,
+							this.props.RowWidth.Offset,
+							props.Height.Scale,
+							props.Height.Offset,
+						);
+					} else {
+						height = new UDim2(
+							this.props.RowWidth.Scale,
+							this.props.RowWidth.Offset,
+							props.AutomaticHeight ? 0 : (1 + scaleOffset) * (1 / autoSizeCount),
+							widthOffset / autoSizeCount,
+						);
+					}
+
+					if (shouldAutoX && shouldAutoY) {
+						automaticSize = Enum.AutomaticSize.XY;
+					} else if (shouldAutoY) {
+						automaticSize = Enum.AutomaticSize.Y;
+					} else if (shouldAutoX) {
+						automaticSize = Enum.AutomaticSize.X;
+					}
+
 					containerMap.set(
 						key,
-						<View
-							LayoutOrder={idx}
-							Size={
-								props.Height
-									? new UDim2(
-											this.props.RowWidth.Scale,
-											this.props.RowWidth.Offset,
-											props.Height.Scale,
-											props.Height.Offset,
-									  )
-									: new UDim2(
-											this.props.RowWidth.Scale,
-											this.props.RowWidth.Offset,
-											(1 + scaleOffset) * (1 / autoSizeCount),
-											widthOffset / autoSizeCount,
-									  )
-							}
-							AutomaticSize={this.props.RowWidth === new UDim() ? "X" : "None"}
-						>
+						<View LayoutOrder={idx} Size={height} AutomaticSize={automaticSize}>
 							{(props.MaxHeight !== undefined || props.MinHeight !== undefined) && (
 								<uisizeconstraint
 									Key="ColumnItemSizeConstraint"
@@ -241,7 +257,7 @@ export class RowView extends Roact.Component<RowViewProps> {
 					BackgroundTransparency={1}
 					Size={this.props.Size}
 					{...properties}
-					AutomaticSize={this.props.RowWidth !== new UDim() ? "None" : "X"}
+					AutomaticSize={this.props.AutomaticSize ?? (this.props.RowWidth !== new UDim() ? "None" : "X")}
 					CanvasSize={this.contentsSize.map((size) => new UDim2(0, size.X, 0, size.Y))}
 				>
 					<uilistlayout
@@ -250,7 +266,7 @@ export class RowView extends Roact.Component<RowViewProps> {
 						SortOrder="LayoutOrder"
 						FillDirection="Vertical"
 						Padding={colPadding}
-						VerticalAlignment={this.props.VerticalAlignment ?? "Center"}
+						VerticalAlignment={this.props.VerticalAlignment ?? "Top"}
 					/>
 					{(this.props.MinSize !== undefined || this.props.MaxSize !== undefined) && (
 						<uisizeconstraint
@@ -265,7 +281,10 @@ export class RowView extends Roact.Component<RowViewProps> {
 			);
 		} else {
 			return (
-				<View Size={this.props.Size} AutomaticSize={this.props.RowWidth !== new UDim() ? "None" : "X"}>
+				<View
+					Size={this.props.Size}
+					AutomaticSize={this.props.AutomaticSize ?? (this.props.RowWidth !== new UDim() ? "None" : "X")}
+				>
 					<uilistlayout
 						Ref={this.layoutRef}
 						Key="RowLayout"
