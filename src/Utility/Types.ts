@@ -27,3 +27,8 @@ export interface ElementOf<T extends Roact.AnyComponent> extends Roact.Element {
 
 /** @internal */
 export const isArray = t.array(t.any);
+
+export type WritablePropertiesOf<
+	TInstance extends Instance,
+	TExcludeProps extends keyof TInstance = keyof Instance,
+> = WritableProperties<ExcludeMembers<Omit<TInstance, TExcludeProps>, symbol>>;

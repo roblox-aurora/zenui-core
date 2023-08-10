@@ -1,5 +1,5 @@
 import Roact from "@rbxts/roact";
-import Padding from "../Utility/Padding";
+import Padding, { UPaddingDim } from "../Utility/Padding";
 import { InferEnumNames } from "../Utility/Types";
 import { View, ViewProps } from "./View";
 
@@ -18,7 +18,7 @@ export interface ListViewProps extends Pick<ViewProps, "Position" | "AnchorPoint
 
 	readonly HorizontalAlignment?: InferEnumNames<Enum.HorizontalAlignment>;
 	readonly VerticalAlignment?: InferEnumNames<Enum.VerticalAlignment>;
-	readonly Padding?: Padding;
+	readonly Padding?: UPaddingDim;
 }
 
 /**
@@ -94,15 +94,7 @@ export class ListView extends Roact.Component<ListViewProps> {
 						},
 					}}
 				/>
-				{padding !== undefined && (
-					<Padding
-						Padding={padding}
-						ForwardRef={(_, padding) => {
-							const { Left = 0, Right = 0, Top = 0, Bottom = 0, Vertical = 0, Horizontal = 0 } = padding;
-							this.setPadding(new Vector2(Left + Right + Horizontal * 2, Top + Bottom + Vertical * 2));
-						}}
-					/>
-				)}
+				{padding !== undefined && <Padding Padding={padding} />}
 				{this.props[Roact.Children]}
 			</View>
 		);

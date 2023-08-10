@@ -1,6 +1,6 @@
 import Roact from "@rbxts/roact";
 import Padding, { UPaddingDim } from "../Utility/Padding";
-import { InferEnumNames, RoactEnum } from "../Utility/Types";
+import { InferEnumNames, WritablePropertiesOf, RoactEnum } from "../Utility/Types";
 import { View } from "../Views/View";
 
 export interface RowProps {
@@ -13,6 +13,12 @@ export interface RowProps {
 	 * The maximum height of this row
 	 */
 	readonly MaxHeight?: number;
+
+	// /**
+	//  * Automatic Height
+	//  */
+	// readonly AutomaticHeight?: boolean;
+
 	/**
 	 * The minimum height of this row
 	 */
@@ -46,6 +52,11 @@ export function Row(props: Roact.PropsWithChildren<RowProps>) {
 	return <>{props[Roact.Children]}</>;
 }
 
+type ScrollingFrameProperties = WritablePropertiesOf<
+	Omit<ScrollingFrame, "CanvasSize" | "CanvasPosition">,
+	keyof GuiObject
+>;
+
 interface RowViewDefaultProps {
 	/**
 	 * The size of this row view container
@@ -56,6 +67,11 @@ interface RowViewDefaultProps {
 	 * The width of the rows (if not set, will be automatic)
 	 */
 	readonly RowWidth: UDim;
+
+	/**
+	 * Whether or not this `RowView` scrols
+	 */
+	readonly Scrolling: boolean | Partial<ScrollingFrameProperties>;
 }
 
 export interface RowViewProps extends RowViewDefaultProps {
@@ -66,7 +82,7 @@ export interface RowViewProps extends RowViewDefaultProps {
 	/**
 	 * The amount of padding around the column view
 	 */
-	readonly Padding?: Padding | UPaddingDim;
+	readonly Padding?: UPaddingDim;
 
 	/**
 	 * The horizontal alignment of the row
@@ -93,10 +109,29 @@ export interface RowViewProps extends RowViewDefaultProps {
  * etc.
  */
 export class RowView extends Roact.Component<RowViewProps> {
+	public contentsSize: Roact.Binding<Vector2>;
+	public setContentSize: Roact.BindingFunction<Vector2>;
+
 	public static defaultProps: RowViewDefaultProps = {
 		RowWidth: new UDim(),
 		Size: new UDim2(1, 0, 1, 0),
+		Scrolling: false,
 	};
+
+	private layoutRef = Roact.createRef<UIListLayout>();
+
+	public constructor(props: RowViewProps) {
+		super(props);
+		[this.contentsSize, this.setContentSize] = Roact.createBinding(new Vector2());
+	}
+
+	protected didMount(): void {
+		const layoutRef = this.layoutRef.getValue();
+
+		if (layoutRef !== undefined) {
+			this.setContentSize(layoutRef.AbsoluteContentSize);
+		}
+	}
 
 	/**
 	 * Represents a Row in a `<RowView/>` ({@link RowView})
@@ -138,6 +173,7 @@ export class RowView extends Roact.Component<RowViewProps> {
 			for (const [key, child] of children) {
 				if (child.component === Row) {
 					const props = child.props as RowProps;
+
 					containerMap.set(
 						key,
 						<View
@@ -190,25 +226,65 @@ export class RowView extends Roact.Component<RowViewProps> {
 			}
 		}
 
-		return (
-			<View Size={this.props.Size} AutomaticSize={this.props.RowWidth !== new UDim() ? "None" : "X"}>
-				<uilistlayout
-					Key="RowLayout"
-					SortOrder="LayoutOrder"
-					FillDirection="Vertical"
-					Padding={colPadding}
-					VerticalAlignment={this.props.VerticalAlignment ?? "Center"}
-				/>
-				{(this.props.MinSize !== undefined || this.props.MaxSize !== undefined) && (
-					<uisizeconstraint
-						Key="RowSizeConstraint"
-						MinSize={this.props.MinSize}
-						MaxSize={this.props.MaxSize}
+		if (this.props.Scrolling !== undefined && !!this.props.Scrolling) {
+			const defaultProperties = identity<Partial<ScrollingFrameProperties>>({
+				ScrollBarThickness: 5,
+				ScrollBarImageColor3: Color3.fromRGB(0, 0, 0),
+			});
+			const properties = typeIs(this.props.Scrolling, "boolean")
+				? defaultProperties
+				: { ...defaultProperties, ...this.props.Scrolling };
+
+			return (
+				<scrollingframe
+					BorderSizePixel={0}
+					BackgroundTransparency={1}
+					Size={this.props.Size}
+					{...properties}
+					AutomaticSize={this.props.RowWidth !== new UDim() ? "None" : "X"}
+					CanvasSize={this.contentsSize.map((size) => new UDim2(0, size.X, 0, size.Y))}
+				>
+					<uilistlayout
+						Ref={this.layoutRef}
+						Key="RowLayout"
+						SortOrder="LayoutOrder"
+						FillDirection="Vertical"
+						Padding={colPadding}
+						VerticalAlignment={this.props.VerticalAlignment ?? "Center"}
 					/>
-				)}
-				{padding && <Padding Key="RowPadding" Padding={padding} />}
-				{containerMap}
-			</View>
-		);
+					{(this.props.MinSize !== undefined || this.props.MaxSize !== undefined) && (
+						<uisizeconstraint
+							Key="RowSizeConstraint"
+							MinSize={this.props.MinSize}
+							MaxSize={this.props.MaxSize}
+						/>
+					)}
+					{padding && <Padding Key="RowPadding" Padding={padding} />}
+					{containerMap}
+				</scrollingframe>
+			);
+		} else {
+			return (
+				<View Size={this.props.Size} AutomaticSize={this.props.RowWidth !== new UDim() ? "None" : "X"}>
+					<uilistlayout
+						Ref={this.layoutRef}
+						Key="RowLayout"
+						SortOrder="LayoutOrder"
+						FillDirection="Vertical"
+						Padding={colPadding}
+						VerticalAlignment={this.props.VerticalAlignment ?? "Center"}
+					/>
+					{(this.props.MinSize !== undefined || this.props.MaxSize !== undefined) && (
+						<uisizeconstraint
+							Key="RowSizeConstraint"
+							MinSize={this.props.MinSize}
+							MaxSize={this.props.MaxSize}
+						/>
+					)}
+					{padding && <Padding Key="RowPadding" Padding={padding} />}
+					{containerMap}
+				</View>
+			);
+		}
 	}
 }

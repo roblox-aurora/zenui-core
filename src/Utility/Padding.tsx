@@ -132,6 +132,10 @@ export class UPaddingDim {
 		return new UPaddingDim(new UDim(), udim, new UDim(), udim);
 	}
 
+	public static uniform(this: void, scale: number, offset: number) {
+		return UPaddingDim.axis(new UDim(scale, offset), new UDim(scale, offset));
+	}
+
 	/** @deprecated */
 	public static fromScale(this: void, scale: Padding) {
 		const { Left = 0, Right = 0, Top = 0, Bottom = 0, Vertical = 0, Horizontal = 0 } = scale;
@@ -161,13 +165,22 @@ export class UPaddingDim {
 			this.Bottom.sub(other.Bottom),
 		);
 	}
+
+	public Into(): Omit<UIPadding, keyof Instance> {
+		return {
+			PaddingLeft: this.Left,
+			PaddingTop: this.Top,
+			PaddingRight: this.Right,
+			PaddingBottom: this.Bottom,
+		} as Omit<UIPadding, keyof Instance>;
+	}
 }
 
 /** @deprecated Now `UPaddingDim` */
 export const PaddingDim = UPaddingDim;
 export type PaddingDim = UPaddingDim;
 
-export default interface Padding {
+export interface Padding {
 	Left?: number;
 	Top?: number;
 	Right?: number;
@@ -176,37 +189,22 @@ export default interface Padding {
 	Horizontal?: number;
 }
 export interface PaddingProps {
-	Padding: Padding | UPaddingDim;
-	/** @deprecated */
-	ForwardRef?: (rbx: UIPadding, padding: Padding) => void;
+	Padding: UPaddingDim | Padding;
 }
-export default function Padding({ Padding: padding, ForwardRef: forwardRef }: PaddingProps) {
-	if (padding instanceof UPaddingDim) {
-		return (
-			<uipadding
-				PaddingLeft={padding.Left}
-				PaddingTop={padding.Top}
-				PaddingRight={padding.Right}
-				PaddingBottom={padding.Bottom}
-			/>
-		);
+export function Padding(props: PaddingProps) {
+	if (!(props.Padding instanceof UPaddingDim)) {
+		props.Padding = UPaddingDim.fromOffset(props.Padding);
 	}
 
-	const { Left = 0, Right = 0, Top = 0, Bottom = 0, Vertical = 0, Horizontal = 0 } = padding;
-
+	const padding = props.Padding;
 	return (
 		<uipadding
-			Ref={
-				forwardRef !== undefined
-					? (ref) => {
-							forwardRef(ref, padding);
-					  }
-					: undefined
-			}
-			PaddingBottom={new UDim(0, Bottom + Vertical)}
-			PaddingTop={new UDim(0, Top + Vertical)}
-			PaddingRight={new UDim(0, Right + Horizontal)}
-			PaddingLeft={new UDim(0, Left + Horizontal)}
+			PaddingLeft={padding.Left}
+			PaddingTop={padding.Top}
+			PaddingRight={padding.Right}
+			PaddingBottom={padding.Bottom}
 		/>
 	);
 }
+
+export default Padding;
